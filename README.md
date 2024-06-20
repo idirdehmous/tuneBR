@@ -43,9 +43,9 @@ module load cmake
 
 
 STEP1 : INSTALL TE FORTRAN/Python EXTENSION TO READ THE GSA FILE (Bmatrix COVARIANCES )
+
         mkdir -p tuneBR/build 
-        cd tuneBR/build  
-        
+        cd tuneBR/build          
         cmake   ../  
         make 
         make install  
