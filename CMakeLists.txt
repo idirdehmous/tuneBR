@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 3.5)
-
 project(readgsa LANGUAGES C Fortran)
 
 find_package (Python3 COMPONENTS Interpreter)
