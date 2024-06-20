@@ -1,4 +1,4 @@
-      SUBROUTINE READCOV(pcov,kdim,nsmax,kpar,cfile ,llverb,kret)
+       SUBROUTINE READCOV(pcov,kdim,nsmax,kpar,cfile ,llverb,kret)
 !
 !         read a set of nonsep matrices for the requested parameter
 !         from a GSA file
