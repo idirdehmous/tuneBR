@@ -1,4 +1,4 @@
-"""
+""
 This package is a "pure python" re-implementation of   an 
 existing tool ( tuneBR ) which has been already developed 
 by the RC-LACE colleagues Benedikt Strajnar &  Gergely Boloni 
