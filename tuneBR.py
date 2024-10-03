@@ -17,13 +17,20 @@ https://rmets.onlinelibrary.wiley.com/doi/pdf/10.1256/qj.05.108
 @__LAST MODIFICATION: 20/10/2023 
 """
 
+# SYSTEM 
 import os
 import sys  
+# PLOT 
+import matplotlib.pyplot as plt 
+
+# MISC
 sys.path.append("./modules")
 import configparser
 from   datetime            import  datetime ,timedelta 
 from   statistics          import  mean 
-from   modules.sigma_bo    import  Predef, Diag , Ratios , RatiosByDate 
+
+# CUSTOM 
+from   modules.sigma_bo    import  Predef, Diag , AverageRatios , RatiosByCycle
 from   modules.setting_env import  TuneEnv 
 from   modules.odb         import  Odb
 import gsacov 
@@ -106,19 +113,22 @@ so_pred_bt  , so_pred_dbt  =Predef ( PathDict , cdtg , lverb , lwrite).GetSigmaP
 so_pred_q   , so_pred_dq   =Predef ( PathDict , cdtg , lverb , lwrite).GetSigmaP ("q" )
 so_pred_ke  , so_pred_dke  =Predef ( PathDict , cdtg , lverb , lwrite).GetSigmaP ("ke") 
 
-
 # COMPUTE SIGMA_O AND SIGMA_B DIAGNOSTICS 
 print("COMPUTE SIGMA_O, SIGMA_B DIAGS ...!"+"\n")
 #  real  , real   |      dict    , dict      
-sb_diag_t  , so_diag_t ,sb_diag_dt  ,so_diag_dt  , pt  =Diag(PathDict ,cdtg, lverb , lwrite).GetSigmaD("t" )
-sb_diag_bt , so_diag_bt,sb_diag_dbt ,so_diag_dbt , pbt =Diag(PathDict ,cdtg, lverb , lwrite).GetSigmaD("bt")
+sb_diag_t  , so_diag_t  , sb_diag_dt   , so_diag_dt   , pt  =Diag(PathDict ,cdtg, lverb , lwrite).GetSigmaD("t" )
+sb_diag_bt , so_diag_bt , sb_diag_dbt  , so_diag_dbt  , pbt =Diag(PathDict ,cdtg, lverb , lwrite).GetSigmaD("bt")
+sb_diag_q  , so_diag_q  , sb_diag_dq   , so_diag_dq   , pq  =Diag(PathDict ,cdtg, lverb , lwrite).GetSigmaD("q" )
+sb_diag_ke , so_diag_ke , sb_diag_dke  , so_diag_dke  , pke =Diag(PathDict ,cdtg, lverb , lwrite).GetSigmaD("ke")
 
-sb_diag_q  , so_diag_q , sb_diag_dq   ,so_diag_dq   ,pq =Diag(PathDict ,cdtg, lverb , lwrite).GetSigmaD("q" )
-sb_diag_ke , so_diag_ke, sb_diag_dke  ,so_diag_dke  ,pke=Diag(PathDict ,cdtg, lverb , lwrite).GetSigmaD("ke")
 
-# NEXT : give dict with date as keys for RatioByDate
+# DICTS
+sb_pred_d =[sb_pred_t,sb_pred_q ,sb_pred_ke]               # PREDEFINED Sb (sb_bt PREDEFINED DOESN'T EXIST FOR BRIGHTNESS T)
+so_pred_d =[so_pred_dt,so_pred_dbt,so_pred_dq,so_pred_dke]    #    //      So
+sb_diag_d =[sb_diag_dt,sb_diag_dbt,sb_diag_dq,sb_diag_dke]    # DIAGNOSED  Sb 
+so_diag_d =[so_diag_dt,so_diag_dbt,so_diag_dq,so_diag_dke]    #    //      So
 
-quit()
+
 # USE THE SAME VAR NOTATION AS IN RC-LACE FORTRAN CODE
 sb_pred=[sb_pred_t,sb_pred_q,sb_pred_ke]               # PREDEFINED Sb (sb_bt PREDEFINED DOESN'T EXIST FOR BRIGHTNESS T)
 so_pred=[so_pred_t,so_pred_bt,so_pred_q,so_pred_ke]    #    //      So
@@ -136,12 +146,27 @@ rednmc=env.rednmc
 
 #r =Ratios(PathDict, Nobs, rednmc , so_pred , so_diag , sb_pred  , sb_diag ,lwrite)
 
-rd=RatiosByDate(PathDict, cdtg, so_pred) 
+rd=RatiosByCycle(PathDict, cdtg, rednmc , so_pred_d ,so_diag_d , sb_pred_d, sb_diag_d, Nobs ) 
+ro , rb = rd.GetByDate ()
+
+x=[]
+rrso=[]
+rrsb=[]
+i=0
+for i,dt in enumerate(cdtg):
+    i=i+1
+    x.append(i)
+    rrso.append(ro[dt])
+    rrsb.append(rb[dt] )
+
+plt.plot(  x , rrso )
+plt.plot(  x , rrsb )
+plt.show()
 quit()
 
 
 
-r=Ratios(PathDict, Nobs, rednmc , so_pred , so_diag , sb_pred  , sb_diag ,lwrite)
+r=AverageRatios(PathDict, Nobs, rednmc , so_pred , so_diag , sb_pred  , sb_diag ,lwrite)
 
 # GET RATIOS
 rot  , robt  , roq  , roke  ,roav = r.RatioSo()   # SIGMAO
