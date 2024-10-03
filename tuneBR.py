@@ -31,6 +31,7 @@ from   statistics          import  mean
 
 # CUSTOM 
 from   modules.sigma_bo    import  Predef, Diag , AverageRatios , RatiosByCycle
+from   rsbo_plotter        import  RatioPlotter
 from   modules.setting_env import  TuneEnv 
 from   modules.odb         import  Odb
 import gsacov 
@@ -147,25 +148,13 @@ rednmc=env.rednmc
 #r =Ratios(PathDict, Nobs, rednmc , so_pred , so_diag , sb_pred  , sb_diag ,lwrite)
 
 rd=RatiosByCycle(PathDict, cdtg, rednmc , so_pred_d ,so_diag_d , sb_pred_d, sb_diag_d, Nobs ) 
-ro , rb = rd.GetByDate ()
+dro , drb = rd.GetByDate ()
 
-x=[]
-rrso=[]
-rrsb=[]
-i=0
-for i,dt in enumerate(cdtg):
-    i=i+1
-    x.append(i)
-    rrso.append(ro[dt])
-    rrsb.append(rb[dt] )
 
-plt.plot(  x , rrso )
-plt.plot(  x , rrsb )
-plt.show()
+rp=RatioPlotter ( PathDict , cdtg , False , False , dro , drb   )
+rp.PlotByDay()
+
 quit()
-
-
-
 r=AverageRatios(PathDict, Nobs, rednmc , so_pred , so_diag , sb_pred  , sb_diag ,lwrite)
 
 # GET RATIOS
