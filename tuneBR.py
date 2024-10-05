@@ -139,6 +139,7 @@ so_diag=[so_diag_t,so_diag_bt,so_diag_q,so_diag_ke]    #    //      So
 # TOTAL N OBS (DEVIDE pke/2 TO GET N OBS WIND )
 Nobs =[ pt , pbt , pq , pke/2. ]
 
+
 # OBS MEAN 
 Mobs =int(sum(Nobs)/len(Nobs))
 
