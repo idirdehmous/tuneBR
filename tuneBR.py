@@ -67,14 +67,16 @@ bdate    =env.BeginDate
 edate    =env.EndDate 
 cycle_inc=env.cycle_inc  
 
-
 # INIT GSA COV FORTRAN ROUTINE VARIABLES 
 statfile=env.stabal
 nlev    =env.nflev
 nsmax   =env.nsmax
 deltax  =env.deltax
+
+# GET OPTIONS
 lverb   =env.llverb
 lwrite  =env.lwrite
+lplot   =env.lplot
 
 # GET BACKGROUND STANDARD DEVIATIONS (PROFILES &  MEANS)
 g=gsacov.GSA(PathDict , statfile ,nsmax ,nlev , deltax , lverb ,lwrite )
@@ -149,13 +151,7 @@ rednmc=env.rednmc
 #r =Ratios(PathDict, Nobs, rednmc , so_pred , so_diag , sb_pred  , sb_diag ,lwrite)
 
 rd=RatiosByCycle(PathDict, cdtg, rednmc , so_pred_d ,so_diag_d , sb_pred_d, sb_diag_d, Nobs ) 
-dro , drb = rd.GetByDate ()
-
-
-rp=RatioPlotter ( PathDict , cdtg , False , False , dro , drb   )
-rp.PlotByDay()
-
-quit()
+d_ro , d_rb = rd.GetByDate ()
 r=AverageRatios(PathDict, Nobs, rednmc , so_pred , so_diag , sb_pred  , sb_diag ,lwrite)
 
 # GET RATIOS
@@ -181,6 +177,15 @@ print( 60*"-" +"\n"+    \
                 +"\n"+ 60*"-")
 if lverb == True:
    print("\n"+"Input/output files are written in "+os.getenv("PWD")+"/out")
+
+
+
+if lplot==True:
+    rp=RatioPlotter ( PathDict , cdtg , d_ro ,d_rb, lplot ,lverb  )
+    rp.PlotByDay()
+    #rp.PlotByHour( None , [0, 12] )
+
+
 
 print( " ")
 EndTime = datetime.now()
