@@ -16,6 +16,7 @@ class TuneEnv:
           self.njobs    = config.get('DATES', 'NSLICE'       , fallback=2)
           self.llverb   = config.getboolean('OPTIONS' ,'LLVERB', fallback="false")
           self.lwrite   = config.getboolean('OPTIONS' ,'LWRITE', fallback="false")
+          self.lplot    = config.getboolean('OPTIONS' ,'LPLOT', fallback="false")
 
 
           pp = config.items("PATHS")
