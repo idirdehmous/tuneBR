@@ -77,6 +77,7 @@ deltax  =env.deltax
 lverb   =env.llverb
 lwrite  =env.lwrite
 lplot   =env.lplot
+hlist   =env.hours
 
 # GET BACKGROUND STANDARD DEVIATIONS (PROFILES &  MEANS)
 g=gsacov.GSA(PathDict , statfile ,nsmax ,nlev , deltax , lverb ,lwrite )
@@ -148,13 +149,13 @@ Mobs =int(sum(Nobs)/len(Nobs))
 # INIT RATIO OBJECT WITH CORRESPONDING PREDEF AND DIAG LISTS 
 rednmc=env.rednmc
 
-#r =Ratios(PathDict, Nobs, rednmc , so_pred , so_diag , sb_pred  , sb_diag ,lwrite)
-
-rd=RatiosByCycle(PathDict, cdtg, rednmc , so_pred_d ,so_diag_d , sb_pred_d, sb_diag_d, Nobs ) 
+# GET DAY TO DAY  Ratios 
+rd=RatiosByCycle(PathDict, cdtg, rednmc , so_pred_d ,so_diag_d , sb_pred_d, sb_diag_d, Nobs, lverb , lwrite ) 
 d_ro , d_rb = rd.GetByDate ()
-r=AverageRatios(PathDict, Nobs, rednmc , so_pred , so_diag , sb_pred  , sb_diag ,lwrite)
 
-# GET RATIOS
+
+# GET AVERAGED RATIOS 
+r=AverageRatios(PathDict, Nobs, rednmc , so_pred , so_diag , sb_pred  , sb_diag ,lwrite)
 rot  , robt  , roq  , roke  ,roav = r.RatioSo()   # SIGMAO
 rbt  , rbq   , rbke , rbav        = r.RatioSb()   # SIGMAB
 
@@ -181,16 +182,13 @@ if lverb == True:
 
 
 if lplot==True:
-    rp=RatioPlotter ( PathDict , cdtg , d_ro ,d_rb, lplot ,lverb  )
+    rp=RatioPlotter ( PathDict , cdtg, d_ro, d_rb, lverb, lplot , hlist )
     rp.PlotByDay()
-    #rp.PlotByHour( None , [0, 12] )
-
-
-
-print( " ")
-EndTime = datetime.now()
-Duration=EndTime - StartTime
-print( " SCRIPT RUN TIME : \n" , Duration )
+    
+if lverb==True:
+    EndTime = datetime.now()
+    Duration=EndTime - StartTime
+    print( " SCRIPT RUN TIME : \n" , Duration )
 # END 
 quit()
 
