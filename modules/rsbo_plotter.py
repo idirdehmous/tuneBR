@@ -3,6 +3,7 @@ import sys
 import matplotlib.pyplot as plt 
 from matplotlib.dates import DateFormatter, DayLocator, HourLocator
 import matplotlib.dates  as mdates 
+import matplotlib as mpl
 from   datetime import datetime  , timedelta 
 from collections import OrderedDict
 import pytz 
@@ -15,7 +16,6 @@ class RatioPlotter:
                          rsb_dict=None,
                          lverb=None , 
                          lplot     =None ,
-                         dates_range=None,
                          hours      =None ):
 
           self.path =  paths
@@ -25,11 +25,14 @@ class RatioPlotter:
           self.rso  =  rsb_dict      # Dict 
           self.lplot=  lplot 
           self.lverb=  lverb  
+          self.hlist=  hours 
           return None
 
       def InitPlot (self):
-          fig, ax = plt.subplots( figsize=(10,8), dpi=250 )
-          
+          mpl.rcParams.update({"axes.titlesize":"smaller",
+                               "axes.labelsize":"smaller",
+                              "axes.formatter.use_mathtext" : True })
+          fig, ax = plt.subplots( figsize=(8,6), dpi=250 )
           return ax 
 
 
@@ -61,32 +64,39 @@ class RatioPlotter:
 
 
       def PlotByDay(self):
-          # TOD O FORMAT DT TICKS !!!!
-
           dt=[]
           sorted_rso = OrderedDict(sorted(self.rso.items()))
+
           for k in sorted_rso.keys():
               dtk=datetime.strptime(k, "%Y%m%d%H")
               dt.append( dtk )
           rso=[ self.rso[xd] for xd in  self.dates ]
           rsb=[ self.rsb[xd] for xd in  self.dates ]
 
+          # WRITE IN TITLE
+          bgn=str(min(list(sorted_rso.keys() ) ) )[:-2]
+          end=str(max(list(sorted_rso.keys() ) ) )[:-2]
+          htxt=[ str(h)  for h in self.hlist  ]
+          #htxt= ",".join( htxt)
+          htxt="00,06,12,18"
+          ndays=str(  len(set([ d[:-2] for d in list(sorted_rso)   ] ))  ) 
+
           ax=self.InitPlot()
 
-
-          ax.plot_date(  dt , rso  , label="r_o" , xdate=True, ls="-", lw=1.5 ,color="green", markersize=5)
-          ax.plot_date(  dt , rsb  , label="r_b" , xdate=True, ls="-", lw=1.5 ,color="red"  , markersize=5)
-          plt.title( "Tuning ratios for "+str(len(dt))+" days period" )
+          ax.plot_date(  dt , rso  , label="r_o" , xdate=True, ls="-", lw=0.5 ,color="#85da10", markersize=2)
+          ax.plot_date(  dt , rsb  , label="r_b" , xdate=True, ls="-", lw=0.5 ,color="#e4534f"  , markersize=2)
+          ttle="Tuning ratios for "+ndays+" days period , hours="+htxt+"\n"+" from "+bgn+" to "+end
+          plt.title( ttle )
           locator = mdates.AutoDateLocator()
           formatter = mdates.ConciseDateFormatter(locator)
           ax.xaxis.set_major_locator(locator)
           ax.xaxis.set_major_formatter(formatter)
           plt.xlabel("Dates")
           plt.ylabel("Ratio")
-#          plt.xlim(0,2.5)
+          plt.ylim(0,2.5)
           plt.legend()
-
-          plt.show()
+          plt.savefig( "guess_obs_tuning_ratios.pdf" )
+          #plt.show()
           
 
       def PlotByHour(self, dt_range  ,   hlist=[0,6,12,18]):
