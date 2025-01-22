@@ -73,7 +73,8 @@ class Odb:
                         "VERSION":"1"                 ,
                         "DEGRE":"1"                   ,
                         "DIRECT":"0"                  ,
-                        "F_RECLUNIT":"BYTE"}
+                        "F_RECLUNIT":"BYTE" ,
+                        "ODB_CONSIDER_TABLES":"hdr/body/errstat/"}
 
               # EXPORT 
               for k , v in odb_env.items():
@@ -158,11 +159,14 @@ class Odb:
 
              # RETURN PREDEFINED OBS ERRORS
              if    target=="predef":                  # RETURN PREDEFINED  
+               #print( "Predefined , ",  t_err, tb_err, q_err, uv_err )
                return t_err, tb_err, q_err, uv_err
              # RETURN LISTS FOR DIAGNOSTICS 
              elif  target=="fg_diag":                 # FOR fg_dep
+               #print("Diagnosed " ,  t_fg , tb_fg ,q_fg , uv_fg )
                return t_fg , tb_fg ,q_fg , uv_fg
              elif  target=="an_diag":                 # FOR an_dep
+               #print( "an_diag " , t_an , tb_an , q_an, uv_an )
                return t_an , tb_an , q_an, uv_an
          
      
