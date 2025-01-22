@@ -60,8 +60,16 @@ class AverageRatios(object):
           else:
              outfile.write(str(value) )
 
+      def NotNone (self,item):
+          if item != None:
+             return True
+          else:
+             return False
+
+
+
       def ComputeRatios(self, pred , diag , rednmc,  target  ):
-         
+          #print( pred , diag , rednmc,  target  ) 
           if pred != self.rabso  and diag != self.rabso :
              if target   == "sigmao":
                 ratio =diag/pred
@@ -87,17 +95,40 @@ class AverageRatios(object):
           roq = self.ComputeRatios( self.so_qp  , self.so_qd   ,self.rednmc , target )
           roke= self.ComputeRatios( self.so_kep , self.so_ked  ,self.rednmc , target )
 
-          if robt == None:  robt=0.    # NO OBS FOR BRIGHTNESS T 
-          rrobt=0.0
-          rrot = rot**2* float(self.pt) /float(self.ptot)
-          rroq = roq**2* float(self.pq) /float(self.ptot)
-          rroke= roke**2*float(self.pke)/float(self.ptot)
-          roav = sqrt(  rroq +rrot + rroke )     
+          rot , robt,roke, roq = 0,0,0,0
+          #if robt == None:  robt=0.    # NO OBS FOR BRIGHTNESS T 
+          #rrobt=0.0
+          
+          if self.NotNone(rot) :  
+             rrot = rot**2* float(self.pt) /float(self.ptot)
+          else:
+             rot = self.rabso
+             rrot= self.rabso
+
+          if self.NotNone(robt):  
+             rrobt = robt**2*float(self.pbt)/float(self.ptot)
+          else:
+             robt = self.rabso
+             rrobt= self.rabso
+
+          if self.NotNone(rot) :  
+             rroq = roq**2* float(self.pq) /float(self.ptot)
+          else:
+             roq = self.rabso
+             rroq= self.rabso
+
+          if self.NotNone(rot) :  
+             rroke= roke**2*float(self.pke)/float(self.ptot)
+          else:
+             roke  = self.rabso
+             rroke = self.rabso
+
+          roav = sqrt(  rroq +rrobt + rrot + rroke )     
           if self.lwrite==True:             
-              lines= "ro_t   : "+str("%.4f" % rot)  +"  |   Nobs_t   : "+str(int(self.pt))   +"\n" \
-                     "ro_bt  : "+str("%.4f" % robt) +"  |   Nobs_bt  : "+str(int(self.pbt))  +"\n" \
-                     "ro_q   : "+str("%.4f" % roq)  +"  |   Nobs_q   : "+str(int(self.pq) )  +"\n" \
-                     "ro_ke  : "+str("%.4f" % roke) +"  |   Nobs_ke  : "+str(int(self.pke))  +"\n" \
+              lines= "ro_t   : "+str("%.4f" % rrot)  +"  |   Nobs_t   : "+str(int(self.pt))   +"\n" \
+                     "ro_bt  : "+str("%.4f" % rrobt) +"  |   Nobs_bt  : "+str(int(self.pbt))  +"\n" \
+                     "ro_q   : "+str("%.4f" % rroq)  +"  |   Nobs_q   : "+str(int(self.pq) )  +"\n" \
+                     "ro_ke  : "+str("%.4f" % rroke) +"  |   Nobs_ke  : "+str(int(self.pke))  +"\n" \
                      "\n" \
                      "ro_avg : "+str("%.4f" % roav) +"  |   Nobs_tot : "+str(int(self.ptot)) +"\n"
               self.Write2File( "ratios" ,"so" , lines )
@@ -115,14 +146,31 @@ class AverageRatios(object):
                rbav=sqrt(rbq**2*pq/ptot+rbt**2*pt/ptot+rbke**2*pke/ptot)
           """
           target="sigmab"
+          rrbt, rrbq , rrbke =  0. ,0. ,0. 
           rbt  = self.ComputeRatios( self.sb_tp  , self.sb_td    ,self.rednmc , target )
           rbq  = self.ComputeRatios( self.sb_qp  , self.sb_qd    ,self.rednmc , target )
           rbke = self.ComputeRatios( self.sb_kep , self.sb_ked   ,self.rednmc , target )
           
           # AVERAGE 
-          rrbt =rbt**2 *(self.pt /self.ptot )
-          rrbq =rbq**2 *(self.pq /self.ptot )
-          rrbke=rbke**2*(self.pke/self.ptot )
+          if self.NotNone(rbt)   :  
+             rrbt =rbt**2 *(self.pt /self.ptot )
+          else:
+             rbt = self.rabso 
+             rrbt= self.rabso 
+             
+
+          if self.NotNone(rbq)   :  
+             rrbq =rbq**2 *(self.pq /self.ptot )
+          else:
+             rbq =self.rabso 
+             rrbq=self.rabso 
+
+          if self.NotNone(rbke)  :  
+             rrbke=rbke**2*(self.pke/self.ptot )
+          else:
+             rbke =self.rabso 
+             rrbke=self.rabso 
+
           rbav = sqrt( rrbt  + rrbq  + rrbke )
           if self.lwrite == True:
               lines= "rb_t   : "+str("%.4f" % rbt)  +"  |   Nobs_t   : "+str(int(self.pt))   +"\n" \
@@ -191,7 +239,7 @@ class Predef:
                print("UNKOWN PARAMATER -->",param , " POSSIBLE PARAM SHORT NAME : t , bt , q and ke" )
                sys.exit ()
           for  dt in self.dates:
-              if  self.NotNone(Odb.ReadMandalay (self.basedir, dt, "predef")[idx] ):
+              if  self.NotNone(Odb.ReadMandalay (self.basedir, dt, "predef") ):
                   self.psigma=self.psigma + Odb.ReadMandalay (self.basedir, dt, "predef")[idx]
                   # GET MEAN FOR EACH DATE/TIME 
                   if len( self.psigma) != 0:
@@ -309,15 +357,21 @@ class Diag:
           if param=="q" :  idx=2 ;
           if param=="ke":  idx=3 ;
           diag_so_dict={}
-          diag_sb_dict={}   
+          diag_sb_dict={}  
+          nobs =0
           ncase=[]
+          fg=[]
+          an=[]
           for  dt in self.dates:
-               fg = Odb.ReadMandalay (self.basedir ,dt, "fg_diag")[idx] 
-               an = Odb.ReadMandalay (self.basedir ,dt, "an_diag")[idx]
-               ncase.append(len(fg ))
-               #print ( "WARNING : NO DATA FOUND FOR THE PARAMETER ," ,param, "FOR DATE:", dt)
-               nobs=len(fg)         # THER IS THE SAME N OBS FOR FG AND AN
+               if self.NotNone(Odb.ReadMandalay (self.basedir ,dt, "fg_diag")):
+                  fg = Odb.ReadMandalay (self.basedir ,dt, "fg_diag")[idx] 
+                  ncase.append(len(fg ))
+                  nobs=len(fg)   # THER IS THE SAME N OBS FOR FG AND AN
+               if self.NotNone(Odb.ReadMandalay (self.basedir ,dt, "fg_diag")):
+                  an = Odb.ReadMandalay (self.basedir ,dt, "an_diag")[idx]
+
                if len(fg) !=0 and len(an)!= 0: 
+                  #print( fg , an  )
                   self.sigo.append(self.ComputeSigmao( fg, an ))   # OBSERVATIONS  
                   self.sigb.append(self.ComputeSigmab( fg, an ))   # FIRST GUESS 
                   if  param  =="t" : 
@@ -375,10 +429,11 @@ class RatiosByCycle:
     def __init__(self, PathDict,  cdtg, 
                        rednmc  ,  so_pred_d ,
                        so_diag_d, sb_pred_d , 
-                       sb_diag_d  , Nobs):
+                       sb_diag_d  , Nobs, lverb, lwrite ):
 
 
 #        Ratios.__init__(self )
+        self.basedir = PathDict["BASEDIR"]
         self.cdtg    = cdtg
         self.ptot    =  sum(Nobs)
         self.pt      =  Nobs[0]
@@ -410,14 +465,28 @@ class RatiosByCycle:
 
         
         self.rednmc  = rednmc     
-
         self.rabso =9.9E-310  ; # MISSING DATA
 
         self.rso=None
         self.rsb=None
-        #self.rso_dicts=[]
-        #self.rsb_dicts=[]
+
+        self.lwrite =lwrite
+        self.lverb  =lverb 
         return None
+
+    def Write2File (self , varname , pname , value , dt ):
+        # OUT PATH ( BASEDIR/out)
+        os.system( "mkdir -p "+ self.basedir+"/out" )
+        file_=self.basedir+"/out/"+varname+"_"+pname
+
+        outfile=open(file_  , "w" )
+        if isinstance ( value , list):
+           for i,j in enumerate (value):
+               print( dt +"   "+  str(i+1)+"    "+str(j) )
+               outfile.write(dt +"   "+  str(i+1)+"    "+str(j)+"\n")
+            #outfile.close()
+        else:
+            outfile.write(str(value) )
 
 
     def NotNone (self, item):
@@ -454,12 +523,14 @@ class RatiosByCycle:
 
     def GetByDate(self):
         """
-        Rso = sqrt( (roq**2 * pq /nobs  +rot**2*pt/nobs + robt**2*pbt/nobs + roke**2*pke/nobs  ) )
+        Rso = sqrt( (roq**2 * pq /nobs  +rot**2*pt/nobs + 
+                     robt**2*pbt/nobs + roke**2*pke/nobs  ) )
         """
         dict_rso={}
         dict_rsb={}
 
         for dt in self.cdtg:
+
             # NOBS FOR EACH OBS SUBSET 
             
             lst_tp   = self.CatchExcept(self.so_tp ,dt ) 
@@ -523,11 +594,16 @@ class RatiosByCycle:
 
             # OBS RATIOS FOR EACH DATA/CYCLE             
             target = "sigmao"
-            rot = self.ComputeRatios( self.so_tp [dt]  , sigo_td   ,self.rednmc , target )
-            robt= self.ComputeRatios( self.so_btp[dt]  , sigo_btd  ,self.rednmc , target )
-            roq = self.ComputeRatios( self.so_qp [dt]  , sigo_qd   ,self.rednmc , target )
-            roke= self.ComputeRatios( self.so_kep[dt]  , sigo_ked  ,self.rednmc , target )
-            # THE OBS WEIGHT IS ZERO IF NO OBS (CAN SET IT TO rabso , BUT WILL BE EVEN MULTIPLIED BY pt=0)
+            rot, robt, roq, roke =0,0,0, 0
+            try:
+               rot = self.ComputeRatios( self.so_tp [dt]  , sigo_td   ,self.rednmc , target )
+               robt= self.ComputeRatios( self.so_btp[dt]  , sigo_btd  ,self.rednmc , target )
+               roq = self.ComputeRatios( self.so_qp [dt]  , sigo_qd   ,self.rednmc , target )
+               roke= self.ComputeRatios( self.so_kep[dt]  , sigo_ked  ,self.rednmc , target )
+            except:
+               KeyError 
+               print("No DATA FOR THE DATE:" , dt )
+               # THE OBS WEIGHT IS ZERO IF NO OBS (CAN SET IT TO rabso , BUT WILL BE EVEN MULTIPLIED BY pt=0)
             if not self.NotNone(rot ): rot =0 ; pt =0
             if not self.NotNone(robt): robt=0 ; pbt=0
             if not self.NotNone(roq ): roq =0 ; qt =0
@@ -535,6 +611,11 @@ class RatiosByCycle:
 
             # Rso AVG 
             self.rso = sqrt( (rot**2 * self.pt /self.ptot  +robt**2* self.pbt/self.ptot + roq**2*self.pq/self.ptot + roke**2* self.pke/self.ptot  ) )
+            #if self.lwrite ==True:
+            self.Write2File( "ratio", "t" , rot , dt )
+
+
+            
 
             # B RATIOS FOR EACH DATA/CYCLE
             target="sigmab"
@@ -553,4 +634,5 @@ class RatiosByCycle:
 
             dict_rso[dt]= self.rso 
             dict_rsb[dt]= self.rsb
+
         return  dict_rso , dict_rsb 
