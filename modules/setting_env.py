@@ -17,6 +17,7 @@ class TuneEnv:
           self.llverb   = config.getboolean('OPTIONS' ,'LLVERB', fallback="false")
           self.lwrite   = config.getboolean('OPTIONS' ,'LWRITE', fallback="false")
           self.lplot    = config.getboolean('OPTIONS' ,'LPLOT', fallback="false")
+          self.hours    = config.get('OPTIONS' ,'HOURS', fallback=["00","06","12","18"])
 
 
           pp = config.items("PATHS")
