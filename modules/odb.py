@@ -116,6 +116,8 @@ class Odb:
             j = mp.Process(target=self.OdbExtract, args=(data , ))
  
       def ReadMandalay( basedir, cdtg, target ):
+          ike=0 
+          luv=[]
           # READ EXTRACTED ODB  FILE 
           # INIT LISTS (Equivalent to files I/O in the orginal fortran version )
           t_an =[] ; tb_an =[] ; q_an =[] ; uv_an =[]
@@ -124,7 +126,7 @@ class Odb:
     
           # IF THE MANDALAY EXTRACTION WAS SUCCESSFULL THEN 
           # THE FILE EXISTS OTHERWISE , SKIP THE DATE/TIME
-        
+         
           dataset=None 
           if os.path.isfile(basedir+"/out/depar_raw_"+cdtg ):
              dataset=basedir+"/out/depar_raw_"+cdtg            
@@ -151,20 +153,18 @@ class Odb:
                        q_fg.append (float(fg_dep))
                        q_err.append(float(obs_err))
                     elif int(varno)==3 and an_dep !='NULL' and fg_dep !='NULL' or int(varno)==4 and an_dep !='NULL' and fg_dep !='NULL': # U, V 
+                       luv.append(ike)
                        uv_an.append (float(an_dep))
                        uv_fg.append (float(fg_dep))
                        uv_err.append(float(obs_err))
 
              # RETURN PREDEFINED OBS ERRORS
              if    target=="predef":                  # RETURN PREDEFINED  
-               #print( "Predefined , ",  t_err[0:2], tb_err[0:2], q_err[0:2], uv_err[0:2] )
                return t_err, tb_err, q_err, uv_err
              # RETURN LISTS FOR DIAGNOSTICS 
              elif  target=="fg_diag":                 # FOR fg_dep
-               #print("Diagnosed " ,  t_fg[0:2] , tb_fg[0:2] ,q_fg[0:2] , uv_fg[0:2] )
                return t_fg , tb_fg ,q_fg , uv_fg
              elif  target=="an_diag":                 # FOR an_dep
-               #print( "an_diag " , t_an[0:2] , tb_an[0:2] , q_an[0:2], uv_an[0:2] )
                return t_an , tb_an , q_an, uv_an
          
      
