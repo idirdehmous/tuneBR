@@ -127,21 +127,21 @@ sb_diag_ke , so_diag_ke , sb_diag_dke  , so_diag_dke  , pke =Diag(PathDict ,cdtg
 
 
 # DICTS
-sb_pred_d =[sb_pred_t,sb_pred_q ,sb_pred_ke]               # PREDEFINED Sb (sb_bt PREDEFINED DOESN'T EXIST FOR BRIGHTNESS T)
-so_pred_d =[so_pred_dt,so_pred_dbt,so_pred_dq,so_pred_dke]    #    //      So
-sb_diag_d =[sb_diag_dt,sb_diag_dbt,sb_diag_dq,sb_diag_dke]    # DIAGNOSED  Sb 
-so_diag_d =[so_diag_dt,so_diag_dbt,so_diag_dq,so_diag_dke]    #    //      So
+sb_pred_d =[sb_pred_t,sb_pred_q    ,sb_pred_ke]               # PREDEFINED Sb (sb_bt PREDEFINED DOESN'T EXIST FOR BRIGHTNESS T)
+so_pred_d =[so_pred_dt,so_pred_dbt ,so_pred_dq ,so_pred_dke]    #    //      So
+sb_diag_d =[sb_diag_dt,sb_diag_dbt ,sb_diag_dq ,sb_diag_dke]    # DIAGNOSED  Sb 
+so_diag_d =[so_diag_dt,so_diag_dbt ,so_diag_dq ,so_diag_dke]    #    //      So
 
 
 # USE THE SAME VAR NOTATION AS IN RC-LACE FORTRAN CODE
 sb_pred=[sb_pred_t,sb_pred_q,sb_pred_ke]               # PREDEFINED Sb (sb_bt PREDEFINED DOESN'T EXIST FOR BRIGHTNESS T)
-so_pred=[so_pred_t,so_pred_bt,so_pred_q,so_pred_ke]    #    //      So
-sb_diag=[sb_diag_t,sb_diag_bt,sb_diag_q,sb_diag_ke]    # DIAGNOSED  Sb 
-so_diag=[so_diag_t,so_diag_bt,so_diag_q,so_diag_ke]    #    //      So
+so_pred=[so_pred_t,so_pred_bt ,so_pred_q ,so_pred_ke]    #    //      So
+sb_diag=[sb_diag_t,sb_diag_bt ,sb_diag_q ,sb_diag_ke]    # DIAGNOSED  Sb 
+so_diag=[so_diag_t,so_diag_bt ,so_diag_q ,so_diag_ke]    #    //      So
 
 # TOTAL N OBS (DEVIDE pke/2 TO GET N OBS WIND )
-Nobs =[ pt , pbt , pq , pke/2. ]
-
+ppke=int(pke/2.)
+Nobs =[ pt , pbt , pq , ppke ]
 
 # OBS MEAN 
 Mobs =int(sum(Nobs)/len(Nobs))
@@ -171,11 +171,13 @@ print( 60*"-" +"\n"+    \
                 +"\n"+  \
        "q       |" ,str(pq ).center(15,' '),str(round(roq ,5)).center(15,' '),str(round(rbq,5)).center(15,' ') \
                 +"\n"+  \
-       "ke      |" ,str(pke).center(15,' '),str(round(roke,5)).center(15,' '),str(round(rbke,5)).center(15,' ')\
+       "ke      |" ,str(ppke).center(15,' '),str(round(roke,5)).center(15,' '),str(round(rbke,5)).center(15,' ')\
                 +"\n"+  \
        60*"-"   +"\n"+  \
        "Mean    |",str(Mobs).center(15,' '),str(round(roav,5)).center(15,' '),str(round(rbav,5)).center(15,' ')\
                 +"\n"+ 60*"-")
+
+# IF WRITE FILE IS True 
 if lverb == True:
    print("\n"+"Input/output files are written in "+os.getenv("PWD")+"/out")
 
