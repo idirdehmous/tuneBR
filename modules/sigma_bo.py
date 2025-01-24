@@ -69,7 +69,6 @@ class AverageRatios(object):
 
 
       def ComputeRatios(self, pred , diag , rednmc,  target  ):
-          #print( "------->", pred , diag , rednmc,  target  ) 
           if pred != self.rabso  and diag != self.rabso :
              if target   == "sigmao":
                 ratio =diag/pred
@@ -95,10 +94,6 @@ class AverageRatios(object):
           roq = self.ComputeRatios( self.so_qp  , self.so_qd   ,self.rednmc , target )
           roke= self.ComputeRatios( self.so_kep , self.so_ked  ,self.rednmc , target )
 
-          rot , robt,roke, roq = 0,0,0,0
-          #if robt == None:  robt=0.    # NO OBS FOR BRIGHTNESS T 
-          #rrobt=0.0
-          
           if self.NotNone(rot) :  
              rrot = rot**2* float(self.pt) /float(self.ptot)
           else:
@@ -111,7 +106,7 @@ class AverageRatios(object):
              robt = self.rabso
              rrobt= self.rabso
 
-          if self.NotNone(rot) :  
+          if self.NotNone(roq) :  
              rroq = roq**2* float(self.pq) /float(self.ptot)
           else:
              roq = self.rabso
@@ -146,7 +141,6 @@ class AverageRatios(object):
                rbav=sqrt(rbq**2*pq/ptot+rbt**2*pt/ptot+rbke**2*pke/ptot)
           """
           target="sigmab"
-          rrbt, rrbq , rrbke =  0. ,0. ,0. 
           rbt  = self.ComputeRatios( self.sb_tp  , self.sb_td    ,self.rednmc , target )
           rbq  = self.ComputeRatios( self.sb_qp  , self.sb_qd    ,self.rednmc , target )
           rbke = self.ComputeRatios( self.sb_kep , self.sb_ked   ,self.rednmc , target )
@@ -266,7 +260,7 @@ class Predef:
                      means.append( dt+"    "+"None")
 
           if self.lwrite == True:
-             self.Write2File ("so_pred_means_vs_date" ,param , means  )
+             self.Write2File ("so_pred_vs_date" ,param , means  )
           if len(self.psigma) != 0:
              so_pred=sum( self.psigma)/len(self.psigma)
              if self.lwrite == True: self.Write2File ("so_pred_mean" ,param ,so_pred  )
@@ -371,7 +365,6 @@ class Diag:
                   an = Odb.ReadMandalay (self.basedir ,dt, "an_diag")[idx]
 
                if len(fg) !=0 and len(an)!= 0: 
-                  #print( fg , an  )
                   self.sigo.append(self.ComputeSigmao( fg, an ))   # OBSERVATIONS  
                   self.sigb.append(self.ComputeSigmab( fg, an ))   # FIRST GUESS 
                   if  param  =="t" : 
@@ -569,8 +562,6 @@ class RatiosByCycle:
                sigo_ked= self.rabso 
 
 
-
-
             # SIGMA B DIAG BY DATE/CYCLE  
             if self.NotNone(lst_td)  :
                sigb_td = self.d.ComputeSigmab( lst_td [0] , lst_td [1] )
@@ -594,7 +585,7 @@ class RatiosByCycle:
 
             # OBS RATIOS FOR EACH DATA/CYCLE             
             target = "sigmao"
-            rot, robt, roq, roke =0,0,0, 0
+            #rot, robt, roq, roke =0,0,0, 0
             try:
                rot = self.ComputeRatios( self.so_tp [dt]  , sigo_td   ,self.rednmc , target )
                robt= self.ComputeRatios( self.so_btp[dt]  , sigo_btd  ,self.rednmc , target )
@@ -603,19 +594,18 @@ class RatiosByCycle:
             except:
                KeyError  
                print("DATA NOT FOUND FOR DATE :", dt )
+
             # THE OBS WEIGHT IS ZERO IF NO OBS (CAN SET IT TO rabso , BUT WILL BE EVEN MULTIPLIED BY pt=0)
-            if not self.NotNone(rot ): rot =0 ; pt =0
-            if not self.NotNone(robt): robt=0 ; pbt=0
-            if not self.NotNone(roq ): roq =0 ; qt =0
-            if not self.NotNone(roke): roke=0 ; ket=0
+            if not self.NotNone(rot ): rot =self.rabso ; pt =0
+            if not self.NotNone(robt): robt=self.rabso ; pbt=0
+            if not self.NotNone(roq ): roq =self.rabso ; qt =0
+            if not self.NotNone(roke): roke=self.rabso ; ket=0
 
             # Rso AVG 
             self.rso = sqrt( (rot**2 * self.pt /self.ptot  +robt**2* self.pbt/self.ptot + roq**2*self.pq/self.ptot + roke**2* self.pke/self.ptot  ) )
             #if self.lwrite ==True:
             self.Write2File( "ratio", "t" , rot , dt )
 
-
-            
 
             # B RATIOS FOR EACH DATA/CYCLE
             target="sigmab"
