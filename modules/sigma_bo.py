@@ -69,7 +69,7 @@ class AverageRatios(object):
 
 
       def ComputeRatios(self, pred , diag , rednmc,  target  ):
-          #print( pred , diag , rednmc,  target  ) 
+          #print( "------->", pred , diag , rednmc,  target  ) 
           if pred != self.rabso  and diag != self.rabso :
              if target   == "sigmao":
                 ratio =diag/pred
@@ -601,9 +601,9 @@ class RatiosByCycle:
                roq = self.ComputeRatios( self.so_qp [dt]  , sigo_qd   ,self.rednmc , target )
                roke= self.ComputeRatios( self.so_kep[dt]  , sigo_ked  ,self.rednmc , target )
             except:
-               KeyError 
-               print("No DATA FOR THE DATE:" , dt )
-               # THE OBS WEIGHT IS ZERO IF NO OBS (CAN SET IT TO rabso , BUT WILL BE EVEN MULTIPLIED BY pt=0)
+               KeyError  
+               print("DATA NOT FOUND FOR DATE :", dt )
+            # THE OBS WEIGHT IS ZERO IF NO OBS (CAN SET IT TO rabso , BUT WILL BE EVEN MULTIPLIED BY pt=0)
             if not self.NotNone(rot ): rot =0 ; pt =0
             if not self.NotNone(robt): robt=0 ; pbt=0
             if not self.NotNone(roq ): roq =0 ; qt =0
